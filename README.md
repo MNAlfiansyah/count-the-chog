@@ -1,6 +1,6 @@
-# 🐰 Count the Chog!
+# Count the Chog!
 
-Game For Tuzi Community
+Game For Chogstar Community
 
 A cute and challenging browser-based game where players need to count chog as they hop across the screen. Test your attention and reflexes as you try to keep track of the bouncing bunnies!
 
