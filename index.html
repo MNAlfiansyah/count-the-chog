@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Count the Rabbits!</title>
+    <title>Count the Chog!</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -24,7 +24,7 @@
             <img src="./assets/banner.jpeg" alt="Raccoon Game Banner" class="banner-image">
         </div>
         <div class="logo-container">
-            <h1 class="game-title">Count the Rabbits!</h1>
+            <h1 class="game-title">Count the Chog!</h1>
         </div>
         <div class="menu-buttons">
             <button class="menu-btn" onclick="startGame()">Play Game</button>
@@ -36,8 +36,8 @@
     <!-- Game Content -->
     <div id="game-content">
         <button class="back-btn" onclick="backToMenu()">Back to Menu</button>
-        <h1>Count the Rabbits!</h1>
-        <div id="score-display">Level: 1 | Press SPACE to count rabbits!</div>
+        <h1>Count the Chog!</h1>
+        <div id="score-display">Level: 1 | Press SPACE to count chog!</div>
         <div id="game-container"></div>
     </div>
 
@@ -54,11 +54,11 @@
         let userCount = 0;
         let gameActive = false;
         let animals = [
-            'assets/rabbit.png',
-            'assets/kami.png',
-            'assets/initia.png',
-            'assets/mammoth.png',
-            'assets/chamelleon.png'
+            'assets/chog.png',
+            'assets/mon.png',
+            'assets/monadverse.png',
+            'assets/over.png',
+            'assets/spiky.png'
         ];
 
         const gameContainer = document.getElementById('game-container');
@@ -113,9 +113,9 @@
             const totalAnimals = 5 + (currentLevel * 2);
             
             let animalSequence = new Array(totalAnimals).fill(false);
-            const minRabbits = Math.max(2, Math.floor(totalAnimals * 0.2));
-            const maxRabbits = Math.ceil(totalAnimals * Math.max(0.3, 0.8 - (currentLevel * 0.05)));
-            const rabbitCount = Math.floor(Math.random() * (maxRabbits - minRabbits + 1)) + minRabbits;
+            const minChog = Math.max(2, Math.floor(totalAnimals * 0.2));
+            const maxChog = Math.ceil(totalAnimals * Math.max(0.3, 0.8 - (currentLevel * 0.05)));
+            const rabbitCount = Math.floor(Math.random() * (maxChog - minChog + 1)) + minChog;
             
             for(let i = 0; i < rabbitCount; i++) {
                 let position;
@@ -229,7 +229,7 @@
                 list.className = 'instructions-list';
                 
                 const instructions = [
-                    "Watch for rabbits moving across the screen",
+                    "Watch for chog moving across the screen",
                     "Press SPACE each time you see a rabbit",
                     "Avoid counting other animals",
                     "Complete each level to advance",
@@ -276,7 +276,7 @@
             } else {
                 showCustomAlert(
                     "Oops!", 
-                    `Wrong! The correct count was ${actualRaccoonCount}. Back to level 1`,
+                    `Wrong! The correct count was ${actualRaccoonCount}.\nYour Score : Level ${currentLevel}`,
                     false
                 );
                 currentLevel = 1;
