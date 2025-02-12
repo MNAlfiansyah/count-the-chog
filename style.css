@@ -491,3 +491,148 @@ h1 {
         opacity: 0;
     }
 }
+
+/* Add responsive styles */
+@media screen and (max-width: 1024px) {
+    #game-container {
+        width: 90vw;
+        height: 54vw; /* Maintains 16:9 ratio */
+        max-height: 600px;
+    }
+
+    .banner-container {
+        width: 90vw;
+        max-width: 600px;
+    }
+
+    .game-title {
+        font-size: 2.8em;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    .game-title {
+        font-size: 2.2em;
+    }
+
+    #score-display {
+        font-size: 1.2em;
+        padding: 10px 25px;
+    }
+
+    .menu-btn {
+        padding: 12px 30px;
+        font-size: 1.1em;
+    }
+
+    .back-btn {
+        top: 15px;
+        left: 15px;
+        padding: 8px 20px;
+        font-size: 1em;
+    }
+
+    .custom-alert {
+        width: 80%;
+        min-width: auto;
+        padding: 15px;
+    }
+
+    .alert-btn {
+        padding: 12px 30px;
+        font-size: 1.1em;
+    }
+
+    .countdown {
+        font-size: 80px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .game-title {
+        font-size: 1.8em;
+    }
+
+    #score-display {
+        font-size: 1em;
+        padding: 8px 20px;
+    }
+
+    .menu-btn {
+        padding: 10px 25px;
+        font-size: 1em;
+        min-width: 160px;
+    }
+
+    .banner-image {
+        height: 150px;
+    }
+
+    .countdown {
+        font-size: 60px;
+    }
+
+    .music-btn {
+        bottom: 70px !important;
+        right: 10px !important;
+        font-size: 0.7em !important;
+        padding: 8px 15px !important;
+    }
+
+    .copyright {
+        font-size: 0.7em;
+        padding: 6px 12px;
+        bottom: 10px;
+        left: 10px;
+    }
+}
+
+/* Fix for very small screens */
+@media screen and (max-width: 320px) {
+    .game-title {
+        font-size: 1.5em;
+    }
+
+    #score-display {
+        font-size: 0.9em;
+    }
+
+    .menu-btn {
+        min-width: 140px;
+    }
+}
+
+/* Fix for landscape orientation on mobile */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    #main-menu {
+        padding: 10px;
+    }
+
+    .banner-container {
+        margin-bottom: 15px;
+    }
+
+    .banner-image {
+        height: 100px;
+    }
+
+    .game-title {
+        margin-bottom: 10px;
+    }
+
+    .menu-buttons {
+        gap: 10px;
+    }
+
+    .menu-btn {
+        padding: 8px 20px;
+    }
+}

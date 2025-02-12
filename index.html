@@ -37,8 +37,9 @@
     <div id="game-content">
         <button class="back-btn" onclick="backToMenu()">Back to Menu</button>
         <h1>Count the Chog!</h1>
-        <div id="score-display">Level: 1 | Press SPACE to count chog!</div>
+        <div id="score-display">Level: 1 | Press SPACE or CLICK to count chog!</div>
         <div id="game-container"></div>
+        <button class="instructions-btn">❓ Instructions</button>
     </div>
 
     <audio id="bgMusic" loop>
@@ -131,6 +132,10 @@
                 clearTimeout(i);
             }
             
+            // Track spawned and completed animals
+            let spawnedAnimals = 0;
+            let completedAnimals = 0;
+            
             // Adjust game duration based on level
             const baseGameDuration = 10000; // 10 seconds base
             const gameDuration = Math.max(baseGameDuration - (currentLevel * 500), 5000); // Minimum 5 seconds
@@ -140,30 +145,35 @@
                 const randomDelay = Math.random() * (gameDuration * 0.7); // Use 70% of total time for spawns
                 
                 setTimeout(() => {
-                    spawnAnimal(isRabbit);
+                    spawnAnimal(isRabbit, () => {
+                        completedAnimals++;
+                        if (completedAnimals === totalAnimals) {
+                            setTimeout(() => {
+                                gameActive = false;
+                                checkAnswer();
+                            }, 500); // Small delay to ensure all animations complete
+                        }
+                    });
+                    spawnedAnimals++;
                 }, randomDelay);
             });
-
-            // End level after all animals have had time to cross
-            setTimeout(() => {
-                gameActive = false;
-            }, gameDuration);
         }
 
-        function spawnAnimal(isRaccoon) {
+        function spawnAnimal(isRaccoon, onComplete) {
             activeAnimals++;
             const animal = document.createElement('div');
             animal.className = 'animal';
             
             const containerHeight = gameContainer.offsetHeight;
-            const minY = 100;
-            const maxY = containerHeight - 80;
+            const containerWidth = gameContainer.offsetWidth;
+            const minY = containerHeight * 0.1; // 10% from top
+            const maxY = containerHeight * 0.8; // 80% from top
             
             const randomY = minY + Math.random() * (maxY - minY);
             animal.style.top = randomY + 'px';
             
-            // Random starting position from left side
-            const startX = -100 + (Math.random() * -50);
+            // Adjust starting position based on container width
+            const startX = -60; // Animal width
             animal.style.left = startX + 'px';
             
             const img = document.createElement('img');
@@ -175,14 +185,13 @@
             gameContainer.appendChild(animal);
             
             let posX = startX;
-            // Base speed increases with level
-            const baseSpeed = 2.5 + (currentLevel * 0.5);
-            // Random speed variation
-            const speed = baseSpeed + Math.random() * 1.0;
+            // Reduced base speed and level scaling
+            const baseSpeed = (containerWidth / 800) * (1.5 + (currentLevel * 0.3));
+            const speed = baseSpeed + Math.random() * (baseSpeed * 0.2); // Reduced speed variation
             
-            // Increase amplitude and frequency with level for more erratic movement
-            const amplitude = 4 + Math.random() * 7 + (currentLevel * 2);
-            const frequency = (0.002 + Math.random() * 0.002) * (1 + currentLevel * 0.1);
+            // Reduced amplitude scaling
+            const amplitude = (containerHeight / 800) * (3 + Math.random() * 5 + (currentLevel));
+            const frequency = (0.001 + Math.random() * 0.001) * (1 + currentLevel * 0.05); // Reduced frequency
             
             let startTime = Date.now();
             let initialY = parseFloat(animal.style.top);
@@ -196,14 +205,12 @@
                 animal.style.left = posX + 'px';
                 animal.style.top = newY + 'px';
                 
-                if (posX < gameContainer.offsetWidth + 60) {
+                if (posX < containerWidth + 60) {
                     requestAnimationFrame(animate);
                 } else {
                     animal.remove();
                     activeAnimals--;
-                    if (activeAnimals === 0 && !gameActive) {
-                        checkAnswer();
-                    }
+                    if (onComplete) onComplete();
                 }
             }
             
@@ -245,7 +252,12 @@
                 const oldP = alert.querySelector('p');
                 alert.replaceChild(list, oldP);
             } else {
-                alert.querySelector('p').textContent = message;
+                const messageEl = alert.querySelector('p');
+                messageEl.textContent = message;
+                messageEl.style.whiteSpace = 'pre-wrap'; // Preserve line breaks
+                messageEl.style.textAlign = 'center';
+                messageEl.style.margin = '20px 0';
+                messageEl.style.lineHeight = '1.5';
             }
             
             alert.className = 'custom-alert ' + (isSuccess ? 'success' : 'error');
@@ -274,9 +286,15 @@
                 currentLevel++;
                 scoreDisplay.textContent = `Level: ${currentLevel} | Count: ${userCount}`;
             } else {
+                // Calculate score based on levels completed
+                const finalScore = currentLevel - 1; // Subtract 1 because they failed the current level
+                const scoreMessage = `Game Over!\n\nFinal Score: ${finalScore} ${finalScore === 1 ? 'level' : 'levels'} completed\n` +
+                    `Your count: ${userCount}\nActual chogs: ${actualRaccoonCount}\n\n` +
+                    `${getFeedbackMessage(finalScore)}`;
+                
                 showCustomAlert(
                     "Oops!", 
-                    `Wrong! The correct count was ${actualRaccoonCount}.\nYour Score : Level ${currentLevel}`,
+                    scoreMessage,
                     false
                 );
                 currentLevel = 1;
@@ -284,16 +302,46 @@
             }
         }
 
+        // Add function to generate feedback message based on score
+        function getFeedbackMessage(score) {
+            if (score === 0) return "Keep practicing! You'll get better!";
+            if (score < 3) return "Good start! Try again to beat your score!";
+            if (score < 5) return "Well done! You're getting good at this!";
+            if (score < 8) return "Impressive! You're becoming a chog counting expert!";
+            if (score < 10) return "Amazing! You're a natural chog counter!";
+            return "Incredible! You're a legendary chog counter!";
+        }
+
+        // Update the keydown event listener and add click event listener
         document.addEventListener('keydown', (e) => {
             if (e.code === 'Space') {
-                if (!gameActive) {
-                    startLevel();
-                } else {
-                    userCount++;
-                    scoreDisplay.textContent = `Level: ${currentLevel} | Count: ${userCount}`;
-                }
+                handleCount();
             }
         });
+
+        // Add click event listener to game container
+        gameContainer.addEventListener('click', () => {
+            handleCount();
+        });
+
+        // Update handle count to prevent multiple rapid clicks
+        let lastClickTime = 0;
+        const clickCooldown = 200; // 200ms cooldown between clicks
+
+        function handleCount() {
+            const currentTime = Date.now();
+            if (currentTime - lastClickTime < clickCooldown) {
+                return; // Ignore clicks during cooldown
+            }
+            lastClickTime = currentTime;
+
+            if (!gameActive) {
+                startLevel();
+            } else {
+                userCount++;
+                scoreDisplay.textContent = `Level: ${currentLevel} | Count: ${userCount}`;
+            }
+        }
 
         function startGame() {
             resetGame();
@@ -304,15 +352,84 @@
             console.log('Game started, attempting music start');
             startMusic(); // Try to start music when game starts
             
-            startCountdown();
+            // Show instructions first, then start countdown when user clicks continue
+            showInstructions();
         }
 
         function showInstructions() {
-            showCustomAlert(
-                "How to Play",
-                "", // Empty message since we're using list
-                true
-            );
+            const alert = document.querySelector('.custom-alert');
+            const overlay = document.querySelector('.overlay');
+            
+            alert.querySelector('h2').textContent = "How to Play";
+            
+            // Create guide container
+            const guideContainer = document.createElement('div');
+            guideContainer.className = 'guide-container';
+            
+            // Add chog image with label
+            const chogGuide = document.createElement('div');
+            chogGuide.className = 'guide-item';
+            chogGuide.innerHTML = `
+                <img src="assets/chog.png" alt="Chog" class="guide-img">
+                <p>✅ Count this one!</p>
+            `;
+            
+            // Add other animals with label
+            const otherGuide = document.createElement('div');
+            otherGuide.className = 'guide-item';
+            otherGuide.innerHTML = `
+                <div class="other-animals">
+                    <img src="assets/mon.png" alt="Other" class="guide-img">
+                    <img src="assets/monadverse.png" alt="Other" class="guide-img">
+                    <img src="assets/over.png" alt="Other" class="guide-img">
+                    <img src="assets/spiky.png" alt="Other" class="guide-img">
+                </div>
+                <p>❌ Don't count these!</p>
+            `;
+            
+            guideContainer.appendChild(chogGuide);
+            guideContainer.appendChild(otherGuide);
+            
+            // Add instructions list
+            const list = document.createElement('ul');
+            list.className = 'instructions-list';
+            
+            const instructions = [
+                "Watch for chog moving across the screen",
+                "Press SPACE or CLICK each time you see a chog",
+                "Avoid counting other animals",
+                "Complete each level to advance",
+                "Be careful - one mistake sends you back to level 1!"
+            ];
+
+            instructions.forEach(instruction => {
+                const li = document.createElement('li');
+                li.textContent = instruction;
+                list.appendChild(li);
+            });
+            
+            // Clear existing content and add new elements
+            const oldContent = alert.querySelector('p');
+            if (oldContent) oldContent.remove();
+            if (alert.querySelector('ul')) alert.querySelector('ul').remove();
+            if (alert.querySelector('.guide-container')) alert.querySelector('.guide-container').remove();
+            
+            alert.insertBefore(guideContainer, alert.querySelector('.alert-btn'));
+            alert.insertBefore(list, alert.querySelector('.alert-btn'));
+            
+            overlay.style.display = 'block';
+            alert.style.display = 'block';
+
+            // Add continue button functionality for instructions
+            const continueBtn = alert.querySelector('.alert-btn');
+            continueBtn.onclick = () => {
+                overlay.style.display = 'none';
+                alert.style.display = 'none';
+                // Only start countdown if we're in the game screen
+                if (document.getElementById('game-content').style.display === 'block') {
+                    startCountdown();
+                }
+            };
         }
 
         function showHighScores() {
@@ -435,7 +552,7 @@
 
         const copyright = document.createElement('div');
         copyright.className = 'copyright';
-        copyright.innerHTML = '© 2024 <a href="https://github.com/mnalfiansyah" target="_blank">Dolpin</a>';
+        copyright.innerHTML = '© 2025 <a href="https://github.com/mnalfiansyah" target="_blank">Dolpin</a>';
         document.body.appendChild(copyright);
 
         // Create snow effect
@@ -510,6 +627,124 @@
                 createSnow();
             }, 200);
         });
+
+        // Add these styles to your CSS
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = `
+            .guide-container {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                margin: 20px 0;
+                padding: 15px;
+                background: rgba(255, 255, 255, 0.9);
+                border-radius: 15px;
+                border: 2px solid #ff9eaf;
+            }
+
+            .guide-item {
+                text-align: center;
+            }
+
+            .guide-img {
+                width: 50px;
+                height: 50px;
+                object-fit: contain;
+                margin: 5px;
+            }
+
+            .other-animals {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin-bottom: 5px;
+            }
+
+            .guide-item p {
+                margin: 5px 0;
+                font-weight: bold;
+                color: #4a4a4a;
+            }
+
+            @media screen and (max-width: 480px) {
+                .guide-img {
+                    width: 40px;
+                    height: 40px;
+                }
+                
+                .guide-item p {
+                    font-size: 0.9em;
+                }
+            }
+        `;
+
+        document.head.appendChild(styleSheet);
+
+        // Add styles for the instructions button
+        styleSheet.textContent += `
+            .instructions-btn {
+                position: fixed;
+                top: 30px;
+                right: 30px;
+                padding: 12px 25px;
+                background: white;
+                color: #9A3CFD;
+                border: 3px solid #ff9eaf;
+                border-radius: 25px;
+                font-family: 'Comic Sans MS', cursive;
+                font-size: 1.1em;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 5px 15px rgba(255, 158, 175, 0.2);
+                z-index: 100;
+            }
+
+            .instructions-btn:hover {
+                background: #ff9eaf;
+                color: white;
+                transform: translateY(-3px) scale(1.05);
+                box-shadow: 0 8px 20px rgba(255, 158, 175, 0.4);
+            }
+
+            @media screen and (max-width: 768px) {
+                .instructions-btn {
+                    top: 15px;
+                    right: 15px;
+                    padding: 8px 20px;
+                    font-size: 1em;
+                }
+            }
+
+            @media screen and (max-width: 480px) {
+                .instructions-btn {
+                    padding: 6px 15px;
+                    font-size: 0.9em;
+                }
+            }
+        `;
+
+        // Add some additional styles for the score display
+        styleSheet.textContent += `
+            .custom-alert p {
+                white-space: pre-wrap;
+                line-height: 1.6;
+                margin: 20px 0;
+                text-align: left;
+                padding: 0 20px;
+            }
+
+            .custom-alert.error p {
+                color: #4a4a4a;
+                font-size: 1.1em;
+            }
+
+            @media screen and (max-width: 480px) {
+                .custom-alert p {
+                    font-size: 0.9em;
+                    padding: 0 10px;
+                }
+            }
+        `;
     </script>
 </body>
 </html>

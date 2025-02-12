@@ -15,17 +15,29 @@ Try to count all the chog that appear on screen while avoiding counting other an
 - More distracting animals
 
 ### Controls
-- **SPACE**: Count a rabbit
+- **SPACE** or **CLICK**: Count a chog
 - One mistake sends you back to level 1, so count carefully!
 
 ## 🎯 How to Play
 
 1. Press "Play Game" to start
-2. Watch carefully as animals move across the screen
-3. Press SPACE each time you see a rabbit
-4. Complete the level by counting the correct number of chog
-5. Progress through levels with increasing difficulty
-6. One wrong count sends you back to level 1!
+2. Read the instructions and identify which animal to count
+3. Watch carefully as animals move across the screen
+4. Press SPACE or CLICK each time you see a chog
+5. Complete the level by counting the correct number of chog
+6. Progress through levels with increasing difficulty
+7. Check your final score when the game ends
+8. One wrong count sends you back to level 1!
+
+## 🎵 Features
+
+- Responsive design for all screen sizes
+- Background music toggle
+- Visual instructions guide
+- Score tracking system
+- Encouraging feedback messages
+- Cute animations and effects
+- Easy-to-use controls (keyboard or mouse)
 
 ## 🛠️ Technical Details
 
@@ -33,3 +45,35 @@ Try to count all the chog that appear on screen while avoiding counting other an
 - HTML5
 - CSS3
 - Vanilla JavaScript
+
+### Responsive Design
+- Works on desktop and mobile devices
+- Adaptive gameplay mechanics
+- Touch-friendly controls
+- Flexible layout for different screen sizes
+
+## 🎨 Visual Guide
+
+### Animals to Count:
+✅ Chog - The main character you need to count
+❌ Other animals - Don't count these!
+
+## 🏆 Scoring
+- Each completed level adds to your score
+- Try to beat your previous high score
+- Get encouraging feedback based on your performance
+
+## 💡 Tips
+- Take your time to identify the chog
+- Don't get distracted by other animals
+- Use either SPACE or CLICK, whichever feels more comfortable
+- Watch the instructions before playing
+- Access the instructions anytime during gameplay using the ❓ button
+
+## 🔄 Updates
+- Added click functionality
+- Improved responsive design
+- Added visual instruction guide
+- Implemented score system
+- Added performance feedback
+- Optimized for mobile devices
